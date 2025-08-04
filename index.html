@@ -3,7 +3,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>음력1월1일 설날: 네가 하루라면 어떻게 할거야?</title>
+  <title>음력 1월 1일 설날: 네가 하루라면 어떻게 할거야?</title>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
   <style>
@@ -35,13 +35,26 @@
       padding: 15px;
       margin-top: 10px;
       border-radius: 5px;
+      position: relative;
+    }
+    .delete-btn {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 0.9em;
+      border-radius: 3px;
     }
   </style>
 </head>
 <body>
-  <h1>음력1월1일 설날: 네가 하루라면 어떻게 할거야?</h1>
-  <textarea id="answerInput" placeholder="나의 선택을 여기에 적어보세요..."></textarea><br/>
-  <button onclick="submitAnswer()">생각모으기</button>
+  <h1>음력 1월 1일 설날: 네가 하루라면 어떻게 할거야?</h1>
+  <textarea id="answerInput" placeholder="여기에 너의 생각을 적어줘!"></textarea><br/>
+  <button onclick="submitAnswer()">생각나누기</button>
 
   <div id="responses"></div>
 
@@ -60,15 +73,23 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    const isAdmin = window.location.search.includes("admin=true");
+
     function submitAnswer() {
       const text = document.getElementById("answerInput").value.trim();
       if (!text) {
-        alert("나의 선택을 여기에 적어보세요!");
+        alert("여기에 너의 생각을 적어줘!");
         return;
       }
       const timestamp = Date.now();
       db.ref("responses/" + timestamp).set({ text });
       document.getElementById("answerInput").value = "";
+    }
+
+    function deleteAnswer(key) {
+      if (confirm("정말 이 답변을 삭제하시겠습니까?")) {
+        db.ref("responses/" + key).remove();
+      }
     }
 
     function loadAnswers() {
@@ -82,6 +103,15 @@
             const entry = document.createElement("div");
             entry.className = "response";
             entry.textContent = data[key].text;
+
+            if (isAdmin) {
+              const delBtn = document.createElement("button");
+              delBtn.className = "delete-btn";
+              delBtn.textContent = "삭제";
+              delBtn.onclick = () => deleteAnswer(key);
+              entry.appendChild(delBtn);
+            }
+
             container.appendChild(entry);
           });
         }
