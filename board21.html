@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>너라면 어떻게 할거야?</title>
+  <style>
+    html, body {{
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Arial", sans-serif;
+      background-color: #f4f4f4;
+    }}
+    #inputContainer {{
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 10;
+    }}
+    #answerInput {{
+      width: 70%;
+      height: 60px;
+      font-size: 1.2em;
+      padding: 10px;
+    }}
+    #submitBtn {{
+      font-size: 1.2em;
+      padding: 10px 20px;
+      margin-left: 10px;
+      cursor: pointer;
+    }}
+    #board {{
+      position: absolute;
+      top: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 1000px;
+      pointer-events: none;
+    }}
+    .bubble {{
+      position: absolute;
+      max-width: 160px;
+      padding: 10px 15px;
+      background-color: #fff;
+      border-radius: 20px;
+      border: 2px solid #ccc;
+      transition: transform 0.2s ease-out;
+      animation: pop 0.3s ease;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      pointer-events: auto;
+    }}
+    .bubble::after {{
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 20px;
+      width: 0;
+      height: 0;
+      border-top: 10px solid #ccc;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+    }}
+    .bubble.expanded {{
+      white-space: normal;
+      z-index: 20;
+      transform: scale(1.8);
+      background-color: #fff8dc;
+    }}
+    .blurred {{
+      filter: blur(4px);
+    }}
+    @keyframes pop {{
+      0% {{ transform: scale(0.2); opacity: 0; }}
+      100% {{ transform: scale(1); opacity: 1; }}
+    }}
+  </style>
+</head>
+<body>
+  <div id="inputContainer">
+    <textarea id="answerInput" placeholder="너라면 어떻게 할거야?"></textarea>
+    <button id="submitBtn">제출하기</button>
+  </div>
+  <div id="board"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {{
+      apiKey: "AIzaSyAqoHgT_SyybUTDUrPgOy7DH-xwLQpLLGU",
+      authDomain: "haru-dc490.firebaseapp.com",
+      databaseURL: "https://haru-dc490-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "haru-dc490",
+      storageBucket: "haru-dc490.firebasestorage.app",
+      messagingSenderId: "1062975092523",
+      appId: "1:1062975092523:web:d0184c83335c539467b76e",
+      measurementId: "G-EGGCFLJ1JY"
+    }};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const boardId = "board21";
+    const board = document.getElementById("board");
+
+    function submitAnswer() {{
+      const text = document.getElementById("answerInput").value.trim();
+      if (!text) return alert("답변을 입력해주세요!");
+      const timestamp = Date.now();
+      db.ref("visual_responses/" + boardId + "/" + timestamp).set({{ text }});
+      document.getElementById("answerInput").value = "";
+    }}
+
+    function placeBubbles(data) {{
+      board.innerHTML = "";
+      const keys = Object.keys(data).slice(-50);
+      const cx = board.offsetWidth / 2;
+      const cy = board.offsetHeight / 2;
+      const step = (2 * Math.PI) / Math.max(keys.length, 1);
+      let radius = 100;
+
+      keys.forEach((key, i) => {{
+        const angle = step * i;
+        const x = cx + radius * Math.cos(angle);
+        const y = cy + radius * Math.sin(angle);
+        const text = data[key].text;
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.style.left = x + "px";
+        bubble.style.top = y + "px";
+        bubble.textContent = text.length > 20 ? text.slice(0, 20) + "..." : text;
+
+        bubble.onclick = (e) => {{
+          e.stopPropagation();
+          document.querySelectorAll(".bubble").forEach(b => b.classList.add("blurred"));
+          bubble.classList.add("expanded");
+          bubble.classList.remove("blurred");
+          bubble.textContent = text;
+        }};
+
+        board.appendChild(bubble);
+        if ((i+1) % 10 === 0) radius += 80;
+      }});
+
+      document.body.onclick = () => {{
+        document.querySelectorAll(".bubble").forEach(b => {{
+          b.classList.remove("expanded");
+          b.classList.remove("blurred");
+        }});
+      }};
+    }}
+
+    db.ref("visual_responses/" + boardId).on("value", snapshot => {{
+      const data = snapshot.val();
+      if (data) placeBubbles(data);
+    }});
+
+    document.getElementById("submitBtn").onclick = submitAnswer;
+  </script>
+</body>
+</html>
