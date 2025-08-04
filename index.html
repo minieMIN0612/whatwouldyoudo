@@ -77,6 +77,23 @@
     .blurred {
       filter: blur(4px);
     }
+    .deleteBtn {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      display: none;
+    }
+    .admin .deleteBtn {
+      display: block;
+    }
     @keyframes pop {
       0% { transform: scale(0.2); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
@@ -106,19 +123,27 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    const isAdmin = window.location.search.includes("admin=true");
     const board = document.getElementById("board");
+    if (isAdmin) document.body.classList.add("admin");
 
     function submitAnswer() {
       const text = document.getElementById("answerInput").value.trim();
       if (!text) return alert("답변을 입력해주세요!");
       const timestamp = Date.now();
-      db.ref("visual_responses/" + timestamp).set({ text });
+      db.ref("visual_responses/main/" + timestamp).set({ text });
       document.getElementById("answerInput").value = "";
+    }
+
+    function deleteAnswer(key) {
+      if (confirm("정말 삭제하시겠습니까?")) {
+        db.ref("visual_responses/main/" + key).remove();
+      }
     }
 
     function placeBubbles(data) {
       board.innerHTML = "";
-      const keys = Object.keys(data).slice(-50); // 최신 50개
+      const keys = Object.keys(data).slice(-50);
       const cx = board.offsetWidth / 2;
       const cy = board.offsetHeight / 2;
       const step = (2 * Math.PI) / Math.max(keys.length, 1);
@@ -136,12 +161,24 @@
         bubble.style.top = y + "px";
         bubble.textContent = text.length > 20 ? text.slice(0, 20) + "..." : text;
 
-        bubble.onclick = (e) => {
+        const delBtn = document.createElement("button");
+        delBtn.className = "deleteBtn";
+        delBtn.innerText = "×";
+        delBtn.onclick = (e) => {
           e.stopPropagation();
-          document.querySelectorAll(".bubble").forEach(b => b.classList.add("blurred"));
-          bubble.classList.add("expanded");
-          bubble.classList.remove("blurred");
-          bubble.textContent = text;
+          deleteAnswer(key);
+        };
+        bubble.appendChild(delBtn);
+
+        bubble.onclick = (e) => {
+          if (!e.target.classList.contains("deleteBtn")) {
+            e.stopPropagation();
+            document.querySelectorAll(".bubble").forEach(b => b.classList.add("blurred"));
+            bubble.classList.add("expanded");
+            bubble.classList.remove("blurred");
+            bubble.textContent = text;
+            bubble.appendChild(delBtn);
+          }
         };
 
         board.appendChild(bubble);
@@ -156,7 +193,7 @@
       };
     }
 
-    db.ref("visual_responses").on("value", snapshot => {
+    db.ref("visual_responses/main").on("value", snapshot => {
       const data = snapshot.val();
       if (data) placeBubbles(data);
     });
