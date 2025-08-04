@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>저학년 3.2. 개학: 너라면 어떻게 할래?</title>
+  <title>무엇을 할래?</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -88,7 +88,7 @@
 </head>
 <body>
   <div id="inputContainer">
-    <input type="text" id="answerInput" placeholder="너라면 개학날 어떤 감정을 바구니에 담아갈래?" />
+    <input type="text" id="answerInput" placeholder="너라면 어떻게 할거야?" />
     <button id="submitBtn">제출하기</button>
   </div>
   <div id="board"></div>
@@ -110,6 +110,11 @@
       measurementId: "G-EGGCFLJ1JY"
     };
     firebase.initializeApp(firebaseConfig);
+
+
+const urlParams = new URLSearchParams(window.location.search);
+const isAdmin = urlParams.get('admin') === '1';
+
 
     const db = firebase.database();
     const boardId = "board1";
@@ -136,7 +141,8 @@
         enlargedText.textContent = text;
         overlay.style.display = "flex";
       };
-        if (isAdmin) {
+
+  if (isAdmin) {
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "삭제";
     deleteBtn.style.position = "absolute";
@@ -149,14 +155,15 @@
     deleteBtn.style.cursor = "pointer";
     deleteBtn.style.fontSize = "0.7em";
     deleteBtn.onclick = (e) => {
-      e.stopPropagation(); // 말풍선 확대 방지
+      e.stopPropagation();
       if (confirm("정말 삭제하시겠습니까?")) {
         boardRef.child(snapshot.key).remove();
-        bubble.remove(); // 삭제 시 즉시 화면에서도 제거
+        bubble.remove();
       }
     };
     bubble.appendChild(deleteBtn);
   }
+
       boardDiv.appendChild(bubble);
     });
 
