@@ -136,6 +136,27 @@
         enlargedText.textContent = text;
         overlay.style.display = "flex";
       };
+        if (isAdmin) {
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "삭제";
+    deleteBtn.style.position = "absolute";
+    deleteBtn.style.top = "5px";
+    deleteBtn.style.right = "5px";
+    deleteBtn.style.background = "red";
+    deleteBtn.style.color = "white";
+    deleteBtn.style.border = "none";
+    deleteBtn.style.borderRadius = "10px";
+    deleteBtn.style.cursor = "pointer";
+    deleteBtn.style.fontSize = "0.7em";
+    deleteBtn.onclick = (e) => {
+      e.stopPropagation(); // 말풍선 확대 방지
+      if (confirm("정말 삭제하시겠습니까?")) {
+        boardRef.child(snapshot.key).remove();
+        bubble.remove(); // 삭제 시 즉시 화면에서도 제거
+      }
+    };
+    bubble.appendChild(deleteBtn);
+  }
       boardDiv.appendChild(bubble);
     });
 
