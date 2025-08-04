@@ -138,8 +138,9 @@ const isAdmin = urlParams.get('admin') === '1';
 
 
     const db = firebase.database();
-    const boardId = "board1";
-    const boardRef = db.ref(boardId);
+ const path = window.location.pathname;
+const boardId = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("."));  
+const boardRef = db.ref(boardId);
     const boardDiv = document.getElementById("board");
     const overlay = document.getElementById("overlay");
     const enlargedText = document.getElementById("enlargedText");
