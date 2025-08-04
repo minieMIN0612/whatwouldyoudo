@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>너라면 어떻게 할거야?</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      padding: 30px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      font-size: 1em;
+      padding: 10px;
+      resize: none;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    .response {
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>너라면 어떻게 할거야?</h1>
+  <textarea id="answerInput" placeholder="여기에 답을 입력하세요..."></textarea><br/>
+  <button onclick="submitAnswer()">제출하기</button>
+
+  <div id="responses"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAqoHgT_SyybUTDUrPgOy7DH-xwLQpLLGU",
+      authDomain: "haru-dc490.firebaseapp.com",
+      databaseURL: "https://haru-dc490-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "haru-dc490",
+      storageBucket: "haru-dc490.firebasestorage.app",
+      messagingSenderId: "1062975092523",
+      appId: "1:1062975092523:web:d0184c83335c539467b76e",
+      measurementId: "G-EGGCFLJ1JY"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function submitAnswer() {
+      const text = document.getElementById("answerInput").value.trim();
+      if (!text) {
+        alert("답변을 입력해주세요!");
+        return;
+      }
+      const timestamp = Date.now();
+      db.ref("responses/" + timestamp).set({ text });
+      document.getElementById("answerInput").value = "";
+    }
+
+    function loadAnswers() {
+      const container = document.getElementById("responses");
+      db.ref("responses").on("value", (snapshot) => {
+        container.innerHTML = "";
+        const data = snapshot.val();
+        if (data) {
+          const keys = Object.keys(data).sort((a, b) => b - a);
+          keys.forEach(key => {
+            const entry = document.createElement("div");
+            entry.className = "response";
+            entry.textContent = data[key].text;
+            container.appendChild(entry);
+          });
+        }
+      });
+    }
+
+    loadAnswers();
+  </script>
+</body>
+</html>
