@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>무엇을 할래?</title>
+  <title>저학년 3.2. 개학날: 너라면 어떻게 할래?</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -15,26 +15,42 @@
       align-items: center;
       background: #f9f9f9;
     }
-    #inputContainer {
-      position: fixed;
-      top: 0;
-      background: white;
-      width: 100%;
-      padding: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      z-index: 10;
-    }
-    #answerInput {
-      width: 70%;
-      font-size: 1.2em;
-      padding: 10px;
-    }
-    #submitBtn {
-      font-size: 1em;
-      padding: 10px 20px;
-    }
+#inputContainer {
+  position: fixed;
+  top: 0;
+  background: white;
+  width: 100%;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#answerInput {
+  width: 90vw;
+  max-width: 600px;
+  font-size: 1.2em;
+  padding: 10px;
+  resize: none;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  line-height: 1.4em;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+#submitBtn {
+  font-size: 1em;
+  padding: 10px 20px;
+  margin-top: 10px;
+  width: 60%;
+  max-width: 200px;
+}
+
     #board {
-      margin-top: 100px;
+      margin-top: 200px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
@@ -84,11 +100,16 @@
       max-height: 80%;
       overflow: auto;
     }
+    @media (max-width: 768px) {
+  #board {
+    margin-top: 220px;
+  }
+}
   </style>
 </head>
 <body>
   <div id="inputContainer">
-    <input type="text" id="answerInput" placeholder="너라면 어떻게 할거야?" />
+    <textarea id="answerInput" placeholder="너라면 개학날 어떤 감정을 바구니에 담아갈거야?" rows="2"></textarea>
     <button id="submitBtn">제출하기</button>
   </div>
   <div id="board"></div>
@@ -117,7 +138,7 @@ const isAdmin = urlParams.get('admin') === '1';
 
 
     const db = firebase.database();
-    const boardId = "board33";
+    const boardId = "board1";
     const boardRef = db.ref(boardId);
     const boardDiv = document.getElementById("board");
     const overlay = document.getElementById("overlay");
