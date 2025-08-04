@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>무엇을 할래?</title>
   <style>
-    body {{
+    body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
@@ -14,8 +14,8 @@
       flex-direction: column;
       align-items: center;
       background: #f9f9f9;
-    }}
-    #inputContainer {{
+    }
+    #inputContainer {
       position: fixed;
       top: 0;
       background: white;
@@ -23,25 +23,25 @@
       padding: 10px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       z-index: 10;
-    }}
-    #answerInput {{
+    }
+    #answerInput {
       width: 70%;
       font-size: 1.2em;
       padding: 10px;
-    }}
-    #submitBtn {{
+    }
+    #submitBtn {
       font-size: 1em;
       padding: 10px 20px;
-    }}
-    #board {{
+    }
+    #board {
       margin-top: 100px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 15px;
       max-width: 800px;
-    }}
-    .bubble {{
+    }
+    .bubble {
       background-color: #e0f7fa;
       padding: 10px 15px;
       border-radius: 20px;
@@ -49,8 +49,8 @@
       position: relative;
       cursor: pointer;
       transition: transform 0.2s ease;
-    }}
-    .bubble::after {{
+    }
+    .bubble::after {
       content: '';
       position: absolute;
       bottom: -10px;
@@ -59,11 +59,11 @@
       height: 0;
       border: 10px solid transparent;
       border-top-color: #e0f7fa;
-    }}
-    .bubble:hover {{
+    }
+    .bubble:hover {
       transform: scale(1.05);
-    }}
-    .overlay {{
+    }
+    .overlay {
       position: fixed;
       top: 0;
       left: 0;
@@ -74,8 +74,8 @@
       justify-content: center;
       align-items: center;
       z-index: 20;
-    }}
-    .enlarged {{
+    }
+    .enlarged {
       background: white;
       padding: 20px;
       font-size: 1.5em;
@@ -83,7 +83,7 @@
       max-width: 90%;
       max-height: 80%;
       overflow: auto;
-    }}
+    }
   </style>
 </head>
 <body>
@@ -99,7 +99,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
   <script>
-    const firebaseConfig = {{
+    const firebaseConfig = {
       apiKey: "AIzaSyAqoHgT_SyybUTDUrPgOy7DH-xwLQpLLGU",
       authDomain: "haru-dc490.firebaseapp.com",
       databaseURL: "https://haru-dc490-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -108,7 +108,7 @@
       messagingSenderId: "1062975092523",
       appId: "1:1062975092523:web:d0184c83335c539467b76e",
       measurementId: "G-EGGCFLJ1JY"
-    }};
+    };
     firebase.initializeApp(firebaseConfig);
 
     const db = firebase.database();
@@ -118,30 +118,30 @@
     const overlay = document.getElementById("overlay");
     const enlargedText = document.getElementById("enlargedText");
 
-    document.getElementById("submitBtn").addEventListener("click", () => {{
+    document.getElementById("submitBtn").addEventListener("click", () => {
       const text = document.getElementById("answerInput").value.trim();
-      if (text) {{
-        boardRef.push({{ text }});
+      if (text) {
+        boardRef.push({ text });
         document.getElementById("answerInput").value = "";
-      }}
-    }});
+      }
+    });
 
-    boardRef.limitToLast(50).on("child_added", snapshot => {{
+    boardRef.limitToLast(50).on("child_added", snapshot => {
       const text = snapshot.val().text;
       const bubble = document.createElement("div");
       bubble.className = "bubble";
       bubble.textContent = text.length > 40 ? text.substring(0, 40) + "..." : text;
       bubble.title = text;
-      bubble.onclick = () => {{
+      bubble.onclick = () => {
         enlargedText.textContent = text;
         overlay.style.display = "flex";
-      }};
+      };
       boardDiv.appendChild(bubble);
-    }});
+    });
 
-    overlay.onclick = () => {{
+    overlay.onclick = () => {
       overlay.style.display = "none";
-    }};
+    };
   </script>
 </body>
 </html>
