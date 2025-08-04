@@ -138,7 +138,7 @@ const isAdmin = urlParams.get('admin') === '1';
 
 
     const db = firebase.database();
-  const path = window.location.pathname;
+const path = window.location.pathname;
 const boardId = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("."));  
 const boardRef = db.ref(boardId);
     const boardDiv = document.getElementById("board");
